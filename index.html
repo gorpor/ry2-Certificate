@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสร้างเกียรติบัตรออนไลน์ (Phase 1)</title>
+    <!-- โหลด Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- โหลด Font TH Sarabun จาก Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center py-10 px-4 min-h-screen">
+    
+    <div class="bg-white p-6 rounded-xl shadow-lg text-center w-full max-w-5xl">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">ทดสอบต้นแบบเกียรติบัตร (Canvas)</h2>
+        <p class="text-gray-600 mb-4">ระบบจะทำการวาดข้อความทับลงบนรูปภาพพื้นหลัง โดยประมวลผลบนเครื่องของคุณเอง</p>
+        
+        <!-- พื้นที่แสดงตัวอย่างเกียรติบัตร -->
+        <div class="overflow-auto mb-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 p-2">
+            <!-- Canvas จะแสดงรูปเกียรติบัตรที่นี่ (ย่อขนาดให้พอดีจอ แต่เวลาโหลดจะความละเอียดเต็ม) -->
+            <canvas id="certCanvas" class="max-w-full h-auto mx-auto shadow-md"></canvas>
+        </div>
+        
+        <button id="downloadBtn" class="bg-blue-600 hover:bg-blue-700 transition-colors text-white text-lg font-bold py-3 px-8 rounded-full shadow-lg flex items-center justify-center mx-auto gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            ดาวน์โหลดเกียรติบัตร (.png)
+        </button>
+    </div>
+
+    <script>
+        // 1. กำหนดข้อมูลจำลอง (Mock Data)
+        const mockData = {
+            name: "นายคมสัน คงเอี่ยม",
+            activity: "ผ่านการอบรมเชิงปฏิบัติการ การจัดการเรียนรู้ด้านปัญญาประดิษฐ์",
+            date: "ให้ไว้ ณ วันที่ 2 ตุลาคม 2569"
+        };
+
+        const canvas = document.getElementById('certCanvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        // สำคัญมาก! บรรทัดนี้ช่วยให้ดึงรูปจากโดเมนอื่นมาวาด Canvas แล้วกดโหลดได้โดยไม่ติด CORS Error
+        img.crossOrigin = "anonymous"; 
+        
+        // ใส่ URL รูปภาพพื้นหลังที่ฝากไว้บน GitHub
+        img.src = "https://gorpor.github.io/ry2-Certificate/bg01.png";
+
+        // 2. เมื่อรูปโหลดเสร็จ ให้ทำการวาด (Render)
+        img.onload = function() {
+            // ตั้งค่าขนาด Canvas ให้เท่ากับขนาดไฟล์รูปภาพต้นฉบับ
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            // วาดรูปพื้นหลังลงไปก่อน
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // -----------------------------------------------------
+            // ปรับแต่งข้อความที่นี่ (ตำแหน่ง X, Y และ ขนาดฟอนต์)
+            // -----------------------------------------------------
+
+            // ตั้งค่าจุดอ้างอิงตรงกลาง (เพื่อให้อักษรอยู่กึ่งกลางภาพ)
+            ctx.textAlign = "center"; 
+            const centerX = canvas.width / 2;
+
+            // วาดชื่อ-สกุล
+            ctx.font = "bold 90px 'Sarabun'"; // ความหนา ขนาด ชื่อฟอนต์
+            ctx.fillStyle = "#1e3a8a"; // สีของตัวอักษร (สีน้ำเงินเข้ม)
+            // (ข้อความ, แกน X, แกน Y) - ปรับตัวเลขแกน Y ขยับขึ้นลงได้
+            ctx.fillText(mockData.name, centerX, canvas.height / 2 - 30); 
+            
+            // วาดชื่อกิจกรรม
+            ctx.font = "500 50px 'Sarabun'";
+            ctx.fillStyle = "#374151"; // สีเทาเข้ม
+            ctx.fillText(mockData.activity, centerX, (canvas.height / 2) + 70);
+
+            // วาดวันที่
+            ctx.font = "400 45px 'Sarabun'";
+            ctx.fillStyle = "#4b5563"; // สีเทา
+            ctx.fillText(mockData.date, centerX, (canvas.height / 2) + 160);
+        };
+
+        // 3. ฟังก์ชันสำหรับกดปุ่มดาวน์โหลด
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            // แปลงสิ่งที่วาดบน Canvas ทั้งหมดให้เป็นข้อมูลรูปภาพ PNG
+            const dataURL = canvas.toDataURL('image/png');
+            
+            // สร้างลิงก์ดาวน์โหลดจำลองแล้วสั่งคลิก
+            const link = document.createElement('a');
+            link.download = `เกียรติบัตร_${mockData.name}.png`;
+            link.href = dataURL;
+            link.click();
+        });
+    </script>
+</body>
+</html>
