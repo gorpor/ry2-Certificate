@@ -18,6 +18,37 @@
         <h2 class="text-2xl font-bold text-gray-800 mb-6">ทดสอบต้นแบบเกียรติบัตร (Canvas)</h2>
         <p class="text-gray-600 mb-4">ระบบจะทำการวาดข้อความทับลงบนรูปภาพพื้นหลัง โดยประมวลผลบนเครื่องของคุณเอง</p>
         
+        <!-- เครื่องมือปรับตำแหน่งข้อความ -->
+        <div class="mb-6 p-4 bg-indigo-50 border border-indigo-100 rounded-lg text-left shadow-sm">
+            <h3 class="font-bold text-indigo-800 mb-3 text-lg flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                เครื่องมือปรับตำแหน่งข้อความ (แกน Y)
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                        <span>ชื่อ-สกุล</span> <span id="valName" class="text-indigo-600 font-bold">-30</span>
+                    </label>
+                    <input type="range" id="nameY" min="-400" max="400" value="-30" class="w-full accent-indigo-600">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                        <span>ชื่อกิจกรรม</span> <span id="valAct" class="text-indigo-600 font-bold">70</span>
+                    </label>
+                    <input type="range" id="actY" min="-400" max="400" value="70" class="w-full accent-indigo-600">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                        <span>วันที่</span> <span id="valDate" class="text-indigo-600 font-bold">160</span>
+                    </label>
+                    <input type="range" id="dateY" min="-400" max="400" value="160" class="w-full accent-indigo-600">
+                </div>
+            </div>
+            <p class="text-xs text-indigo-600 mt-3">* ลองเลื่อนแถบด้านบนเพื่อดูข้อความขยับขึ้นลงแบบเรียลไทม์ จะได้ไม่ต้องสุ่มแก้ตัวเลขในโค้ดครับ</p>
+        </div>
+
         <!-- พื้นที่แสดงตัวอย่างเกียรติบัตร -->
         <div class="overflow-auto mb-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 p-2">
             <!-- Canvas จะแสดงรูปเกียรติบัตรที่นี่ (ย่อขนาดให้พอดีจอ แต่เวลาโหลดจะความละเอียดเต็ม) -->
@@ -50,39 +81,58 @@
         // ใส่ URL รูปภาพพื้นหลังที่ฝากไว้บน GitHub
         img.src = "https://gorpor.github.io/ry2-Certificate/bg01.png";
 
-        // 2. เมื่อรูปโหลดเสร็จ ให้ทำการวาด (Render)
-        img.onload = function() {
-            // ตั้งค่าขนาด Canvas ให้เท่ากับขนาดไฟล์รูปภาพต้นฉบับ
+        // ฟังก์ชันสำหรับวาดเกียรติบัตร (แยกออกมาเพื่อให้เรียกซ้ำได้เวลาเลื่อนแถบ Slider)
+        function renderCertificate() {
+            // ตั้งค่าขนาด Canvas
             canvas.width = img.width;
             canvas.height = img.height;
             
-            // วาดรูปพื้นหลังลงไปก่อน
+            // วาดรูปพื้นหลัง
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             
-            // -----------------------------------------------------
-            // ปรับแต่งข้อความที่นี่ (ตำแหน่ง X, Y และ ขนาดฟอนต์)
-            // -----------------------------------------------------
+            // ดึงค่าการปรับตำแหน่งจาก Slider
+            const nameY = parseInt(document.getElementById('nameY').value);
+            const actY = parseInt(document.getElementById('actY').value);
+            const dateY = parseInt(document.getElementById('dateY').value);
+            
+            // อัปเดตตัวเลขที่แสดงบนหน้าจอ
+            document.getElementById('valName').innerText = nameY;
+            document.getElementById('valAct').innerText = actY;
+            document.getElementById('valDate').innerText = dateY;
 
-            // ตั้งค่าจุดอ้างอิงตรงกลาง (เพื่อให้อักษรอยู่กึ่งกลางภาพ)
+            // ตั้งค่าจุดอ้างอิงตรงกลาง
             ctx.textAlign = "center"; 
             const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2; // จุดกึ่งกลางความสูง
 
             // วาดชื่อ-สกุล
-            ctx.font = "bold 90px 'Sarabun'"; // ความหนา ขนาด ชื่อฟอนต์
-            ctx.fillStyle = "#1e3a8a"; // สีของตัวอักษร (สีน้ำเงินเข้ม)
-            // (ข้อความ, แกน X, แกน Y) - ปรับตัวเลขแกน Y ขยับขึ้นลงได้
-            ctx.fillText(mockData.name, centerX, canvas.height / 2 - 30); 
+            ctx.font = "bold 90px 'Sarabun'"; 
+            ctx.fillStyle = "#1e3a8a"; 
+            ctx.fillText(mockData.name, centerX, centerY + nameY); 
             
             // วาดชื่อกิจกรรม
             ctx.font = "500 50px 'Sarabun'";
-            ctx.fillStyle = "#374151"; // สีเทาเข้ม
-            ctx.fillText(mockData.activity, centerX, (canvas.height / 2) + 70);
+            ctx.fillStyle = "#374151"; 
+            ctx.fillText(mockData.activity, centerX, centerY + actY);
 
             // วาดวันที่
             ctx.font = "400 45px 'Sarabun'";
-            ctx.fillStyle = "#4b5563"; // สีเทา
-            ctx.fillText(mockData.date, centerX, (canvas.height / 2) + 160);
+            ctx.fillStyle = "#4b5563"; 
+            ctx.fillText(mockData.date, centerX, centerY + dateY);
+        }
+
+        // 2. เมื่อรูปโหลดเสร็จ ให้ทำการวาด (Render)
+        img.onload = function() {
+            // รอให้ฟอนต์โหลดเสร็จสมบูรณ์ก่อน เพื่อป้องกันปัญหาตัวอักษรกลายเป็น Arial ในการโหลดครั้งแรก
+            document.fonts.ready.then(function() {
+                renderCertificate();
+            });
         };
+
+        // ผูก Event Listener ให้กับ Slider เมื่อมีการเลื่อน (input) ให้วาดเกียรติบัตรใหม่ทันที
+        document.getElementById('nameY').addEventListener('input', renderCertificate);
+        document.getElementById('actY').addEventListener('input', renderCertificate);
+        document.getElementById('dateY').addEventListener('input', renderCertificate);
 
         // 3. ฟังก์ชันสำหรับกดปุ่มดาวน์โหลด
         document.getElementById('downloadBtn').addEventListener('click', function() {
