@@ -3,198 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบสร้างเกียรติบัตรออนไลน์ (Phase 1)</title>
+    <title>ระบบค้นหาและดาวน์โหลดเกียรติบัตรออนไลน์</title>
     <!-- โหลด Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- โหลด Font TH Sarabun จาก Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; }
-    </style>
-</head>
-<body class="bg-gray-100 flex flex-col items-center py-10 px-4 min-h-screen">
-    
-    <div class="bg-white p-6 rounded-xl shadow-lg text-center w-full max-w-5xl">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">ทดสอบต้นแบบเกียรติบัตร (Canvas)</h2>
-        <p class="text-gray-600 mb-4">ระบบจะทำการวาดข้อความทับลงบนรูปภาพพื้นหลัง โดยประมวลผลบนเครื่องของคุณเอง</p>
         
-        <!-- เครื่องมือปรับตำแหน่งข้อความ -->
-        <div class="mb-6 p-4 bg-indigo-50 border border-indigo-100 rounded-lg text-left shadow-sm">
-            <h3 class="font-bold text-indigo-800 mb-3 text-lg flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-                เครื่องมือปรับตำแหน่งข้อความ (5 Blocks)
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-                        <span>Block 1: ชื่อ-สกุล (Y)</span> <span id="valB1" class="text-indigo-600 font-bold">-140</span>
-                    </label>
-                    <input type="range" id="b1Y" min="-500" max="500" value="-140" class="w-full accent-indigo-600">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-                        <span>Block 2: ข้อความ 1 (Y)</span> <span id="valB2" class="text-indigo-600 font-bold">-10</span>
-                    </label>
-                    <input type="range" id="b2Y" min="-500" max="500" value="-10" class="w-full accent-indigo-600">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-                        <span>Block 3: ข้อความ 2 (Y)</span> <span id="valB3" class="text-indigo-600 font-bold">70</span>
-                    </label>
-                    <input type="range" id="b3Y" min="-500" max="500" value="70" class="w-full accent-indigo-600">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-                        <span>Block 4: วันที่ (Y)</span> <span id="valB4" class="text-indigo-600 font-bold">220</span>
-                    </label>
-                    <input type="range" id="b4Y" min="-500" max="500" value="220" class="w-full accent-indigo-600">
-                </div>
-                <div class="col-span-1 md:col-span-2 lg:col-span-2 grid grid-cols-2 gap-4 bg-pink-50 p-3 rounded-lg border border-pink-200">
-                    <div>
-                        <label class="block text-xs font-medium text-pink-700 mb-1 flex justify-between">
-                            <span>Block 5: เลขที่ (แกน X แนวนอน)</span> <span id="valB5X" class="text-pink-700 font-bold">580</span>
-                        </label>
-                        <input type="range" id="b5X" min="0" max="1000" value="580" class="w-full accent-pink-600">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-pink-700 mb-1 flex justify-between">
-                            <span>Block 5: เลขที่ (แกน Y แนวตั้ง)</span> <span id="valB5Y" class="text-pink-700 font-bold">-370</span>
-                        </label>
-                        <input type="range" id="b5Y" min="-600" max="600" value="-370" class="w-full accent-pink-600">
-                    </div>
-                </div>
-            </div>
-            <p class="text-xs text-indigo-600 mt-3">* Block 1-4 จัดกึ่งกลางอัตโนมัติ (ขยับแค่ขึ้นลง) / Block 5 ขยับได้ทั้งซ้าย-ขวา และ ขึ้น-ลง</p>
-        </div>
-
-        <!-- พื้นที่แสดงตัวอย่างเกียรติบัตร -->
-        <div class="overflow-auto mb-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 p-2">
-            <!-- Canvas จะแสดงรูปเกียรติบัตรที่นี่ (ย่อขนาดให้พอดีจอ แต่เวลาโหลดจะความละเอียดเต็ม) -->
-            <canvas id="certCanvas" class="max-w-full h-auto mx-auto shadow-md"></canvas>
-        </div>
-        
-        <button id="downloadBtn" class="bg-blue-600 hover:bg-blue-700 transition-colors text-white text-lg font-bold py-3 px-8 rounded-full shadow-lg flex items-center justify-center mx-auto gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            ดาวน์โหลดเกียรติบัตร (.png)
-        </button>
-    </div>
-
-    <script>
-        // 1. กำหนดข้อมูลจำลอง (Mock Data) 5 Blocks
-        const mockData = {
-            block1: "นายคมสัน คงเอี่ยม",
-            block2: "ผ่านการอบรมเชิงปฏิบัติการ การจัดการเรียนรู้ด้านปัญญาประดิษฐ์",
-            block3: "ระดับชั้นประถมศึกษาปีที่ ๔-๖ ประจำปีงบประมาณ พ.ศ. ๒๕๖๙",
-            block4: "ให้ไว้ ณ วันที่ ๒ ตุลาคม ๒๕๖๙",
-            block5: "เลขที่ ศธ ๐๔๐๔๐/๒๕๖๙"
-        };
-
-        const canvas = document.getElementById('certCanvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        
-        // IMPORTANT: Set crossOrigin BEFORE setting the src to avoid CORS issues when downloading
-        img.crossOrigin = "anonymous"; 
-        
-        // ใส่ URL รูปภาพพื้นหลังที่ฝากไว้บน GitHub
-        img.src = "https://gorpor.github.io/ry2-Certificate/bg00.png";
-
-        // ฟังก์ชันสำหรับวาดเกียรติบัตร (แยกออกมาเพื่อให้เรียกซ้ำได้เวลาเลื่อนแถบ Slider)
-        function renderCertificate() {
-            // ตั้งค่าขนาด Canvas
-            canvas.width = img.width;
-            canvas.height = img.height;
-            
-            // วาดรูปพื้นหลัง
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            
-            // ดึงค่าการปรับตำแหน่งจาก Slider 
-            const b1Y = parseInt(document.getElementById('b1Y').value);
-            const b2Y = parseInt(document.getElementById('b2Y').value);
-            const b3Y = parseInt(document.getElementById('b3Y').value);
-            const b4Y = parseInt(document.getElementById('b4Y').value);
-            const b5X = parseInt(document.getElementById('b5X').value);
-            const b5Y = parseInt(document.getElementById('b5Y').value);
-            
-            // อัปเดตตัวเลขที่แสดงบนหน้าจอ
-            document.getElementById('valB1').innerText = b1Y;
-            document.getElementById('valB2').innerText = b2Y;
-            document.getElementById('valB3').innerText = b3Y;
-            document.getElementById('valB4').innerText = b4Y;
-            document.getElementById('valB5X').innerText = b5X;
-            document.getElementById('valB5Y').innerText = b5Y;
-
-            // ตั้งค่าจุดอ้างอิงตรงกลาง
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2; 
-
-            // วาด Block 1: ชื่อ-สกุล (Center)
-            ctx.textAlign = "center"; 
-            ctx.font = "bold 90px 'Sarabun'"; 
-            ctx.fillStyle = "#1e3a8a"; 
-            ctx.fillText(mockData.block1, centerX, centerY + b1Y); 
-            
-            // วาด Block 2: ข้อความชุดที่ 1 (Center)
-            ctx.font = "500 50px 'Sarabun'";
-            ctx.fillStyle = "#374151"; 
-            ctx.fillText(mockData.block2, centerX, centerY + b2Y);
-
-            // วาด Block 3: ข้อความชุดที่ 2 (Center)
-            ctx.fillText(mockData.block3, centerX, centerY + b3Y);
-
-            // วาด Block 4: วันที่ (Center)
-            ctx.font = "400 45px 'Sarabun'";
-            ctx.fillStyle = "#4b5563"; 
-            ctx.fillText(mockData.block4, centerX, centerY + b4Y);
-
-            // วาด Block 5: เลขที่ (Right Aligned)
-            ctx.textAlign = "right"; // จัดชิดขวา
-            ctx.font = "bold 40px 'Sarabun'";
-            ctx.fillStyle = "#1f2937"; 
-            // อ้างอิงจากตรงกลางภาพ บวกกับค่า X ที่ปรับได้
-            ctx.fillText(mockData.block5, centerX + b5X, centerY + b5Y);
+        /* สร้าง Animation สำหรับ Loading Spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
         }
 
-        // 2. เมื่อรูปโหลดเสร็จ ให้ทำการวาด (Render)
-        img.onload = function() {
-            // รอให้ฟอนต์โหลดเสร็จสมบูรณ์ก่อน เพื่อป้องกันปัญหาตัวอักษรกลายเป็น Arial ในการโหลดครั้งแรก
+        /* ซ่อน Canvas เพราะเราจะวาดอยู่เบื้องหลัง ไม่ต้องแสดงให้ผู้ใช้เห็นตอนใช้งานจริง */
+        #certCanvas {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-blue-800 text-white py-6 shadow-md">
+        <div class="container mx-auto px-4 max-w-6xl flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center gap-4">
+                <!-- โลโก้ (ใช้ SVG จำลอง) -->
+                <div class="bg-white p-2 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold">ระบบเกียรติบัตรออนไลน์</h1>
+                    <p class="text-blue-200 text-lg">สำนักงานเขตพื้นที่การศึกษาประถมศึกษาระยอง เขต 2</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
+            <!-- Search Bar -->
+            <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">ค้นหารายชื่อผู้รับเกียรติบัตร</h2>
+                <div class="relative w-full md:w-96">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg placeholder-gray-400" placeholder="พิมพ์ชื่อ-สกุล หรือชื่อกิจกรรม เพื่อค้นหา...">
+                </div>
+            </div>
+
+            <!-- สถานะกำลังโหลด -->
+            <div id="loadingState" class="flex flex-col items-center justify-center py-12">
+                <div class="loader mb-4"></div>
+                <p class="text-gray-500 text-xl">กำลังดึงข้อมูลจากระบบ กรุณารอสักครู่...</p>
+            </div>
+
+            <!-- สถานะ Error -->
+            <div id="errorState" class="hidden flex-col items-center justify-center py-12 text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-xl font-bold" id="errorMessage">เกิดข้อผิดพลาดในการดึงข้อมูล</p>
+                <button onclick="fetchData()" class="mt-4 px-6 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition">ลองใหม่อีกครั้ง</button>
+            </div>
+
+            <!-- ตารางแสดงข้อมูล -->
+            <div id="tableContainer" class="hidden overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-lg font-bold text-gray-700 w-16">ลำดับ</th>
+                            <th scope="col" class="px-6 py-4 text-left text-lg font-bold text-gray-700">ชื่อ-สกุล</th>
+                            <th scope="col" class="px-6 py-4 text-left text-lg font-bold text-gray-700">กิจกรรม / รางวัล</th>
+                            <th scope="col" class="px-6 py-4 text-center text-lg font-bold text-gray-700 w-48">ดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- แถวข้อมูลจะถูกเพิ่มด้วย JavaScript ที่นี่ -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- สถานะไม่พบข้อมูล (ตอนค้นหา) -->
+            <div id="noResultState" class="hidden flex-col items-center justify-center py-12 text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-xl">ไม่พบข้อมูลที่ค้นหา</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Canvas สำหรับวาดเกียรติบัตรเบื้องหลัง -->
+    <canvas id="certCanvas"></canvas>
+
+    <!-- ระบบแจ้งเตือน (Toast Notification) แทนการใช้ alert() -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // ------------------------------------------------------------------
+        // ส่วนการตั้งค่า (Configuration)
+        // ------------------------------------------------------------------
+        
+        // 1. URL ของ Google Apps Script ที่เรา Deploy ไว้
+        const API_URL = "https://script.google.com/macros/s/AKfycby5exODhyymg8SMXdvxvsbrRxtOc-IdGBCqE07-PK66mfClAy6tDNrDBimyigY98rr7/exec";
+        
+        // 2. URL รูปภาพพื้นหลัง (ใช้ภาพเปล่าที่ไม่มีกล่องสีชมพู)
+        const BACKGROUND_IMAGE_URL = "https://gorpor.github.io/ry2-Certificate/bg01.png";
+        
+        // 3. พิกัด (Coordinates) ที่ได้จากการทดสอบใน Phase 1
+        const COORD = {
+            block1_Y: -169, // ชื่อ-สกุล
+            block2_Y: -22,  // ข้อความบรรทัด 1
+            block3_Y: 117,  // ข้อความบรรทัด 2
+            block4_Y: 309,  // วันที่
+            block5_X: 885,  // เลขที่ (แนวนอน)
+            block5_Y: -580  // เลขที่ (แนวตั้ง)
+        };
+
+        // ตัวแปรเก็บข้อมูล
+        let certificateData = []; // เก็บข้อมูลทั้งหมดที่โหลดมา
+        let backgroundImage = new Image();
+        let isImageLoaded = false;
+
+        // จัดเตรียม Canvas
+        const canvas = document.getElementById('certCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // ------------------------------------------------------------------
+        // ฟังก์ชันช่วยเหลือ (Helper Functions)
+        // ------------------------------------------------------------------
+
+        // ฟังก์ชันแปลงเลขเลขอารบิก เป็น เลขไทย
+        function convertToThaiNumerals(text) {
+            if (!text) return "";
+            // ถ้า text ไม่ใช่ string ให้แปลงเป็น string ก่อน
+            const str = text.toString();
+            const thaiNumbers = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+            // ใช้ Regex ค้นหาตัวเลข 0-9 ทั้งหมด แล้วแทนที่ด้วยเลขไทยตาม index
+            return str.replace(/\d/g, function(match) {
+                return thaiNumbers[match];
+            });
+        }
+
+        // ฟังก์ชันแสดงกล่องข้อความแจ้งเตือน (Toast)
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            // ตั้งค่าสีตามประเภท (เขียว=สำเร็จ, แดง=ผิดพลาด, ฟ้า=กำลังทำงาน)
+            let bgColor = "bg-green-500";
+            let icon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+            
+            if (type === 'error') {
+                bgColor = "bg-red-500";
+                icon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+            } else if (type === 'info') {
+                bgColor = "bg-blue-500";
+                icon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            }
+
+            toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-x-full opacity-0`;
+            toast.innerHTML = `${icon} <span class="text-lg font-medium">${message}</span>`;
+            
+            toastContainer.appendChild(toast);
+            
+            // ทำให้ Toast เลื่อนเข้ามา
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            }, 10);
+
+            // ตั้งเวลาลบ Toast ออกหลังผ่านไป 3.5 วินาที
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3500);
+        }
+
+        // ------------------------------------------------------------------
+        // ฟังก์ชันดึงข้อมูลและการแสดงผล
+        // ------------------------------------------------------------------
+
+        // โหลดรูปภาพพื้นหลังเตรียมไว้ล่วงหน้าเลย เพื่อให้กดโหลดได้ทันที
+        function preloadImage() {
+            backgroundImage.crossOrigin = "anonymous";
+            backgroundImage.src = BACKGROUND_IMAGE_URL;
+            backgroundImage.onload = () => {
+                isImageLoaded = true;
+                // ตั้งขนาด Canvas เท่ากับรูปจริง
+                canvas.width = backgroundImage.width;
+                canvas.height = backgroundImage.height;
+            };
+            backgroundImage.onerror = () => {
+                showToast("โหลดรูปภาพพื้นหลังไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่อ", "error");
+            }
+        }
+
+        // ดึงข้อมูลจาก Google Apps Script
+        async function fetchData() {
+            // แสดงสถานะโหลด
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('tableContainer').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('noResultState').classList.add('hidden');
+
+            try {
+                const response = await fetch(API_URL);
+                const result = await response.json();
+                
+                if (result.status === "success") {
+                    certificateData = result.data;
+                    renderTable(certificateData);
+                    
+                    // ซ่อนสถานะโหลด แสดงตาราง
+                    document.getElementById('loadingState').classList.add('hidden');
+                    document.getElementById('tableContainer').classList.remove('hidden');
+                } else {
+                    throw new Error(result.error || "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์");
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('errorState').classList.remove('hidden');
+                document.getElementById('errorMessage').innerText = "ไม่สามารถเชื่อมต่อฐานข้อมูลได้: " + error.message;
+            }
+        }
+
+        // วาดตารางข้อมูล
+        function renderTable(dataToRender) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = ""; // ล้างข้อมูลเก่า
+
+            if (dataToRender.length === 0) {
+                document.getElementById('tableContainer').classList.add('hidden');
+                document.getElementById('noResultState').classList.remove('hidden');
+                document.getElementById('noResultState').classList.add('flex');
+                return;
+            }
+
+            document.getElementById('tableContainer').classList.remove('hidden');
+            document.getElementById('noResultState').classList.add('hidden');
+            document.getElementById('noResultState').classList.remove('flex');
+
+            dataToRender.forEach((item, index) => {
+                // ประกอบคำนำหน้าและชื่อ-สกุล
+                const fullName = `${item.prefix} ${item.name}`.trim();
+                
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-blue-50 transition-colors";
+                
+                // สร้างปุ่มดาวน์โหลด โดยผูก Event Listener แบบ inline เพื่อส่ง object ข้อมูลคนนั้นไป
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-lg text-gray-500">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-lg font-medium text-gray-900">${fullName}</td>
+                    <td class="px-6 py-4 text-lg text-gray-500">
+                        <div class="truncate w-64 md:w-full" title="${item.block2}">${item.block2}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <button onclick='downloadCertificate(${JSON.stringify(item)})' class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-lg font-medium transition-colors shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            ดาวน์โหลด
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ระบบค้นหา
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase();
+            const filteredData = certificateData.filter(item => {
+                const fullName = `${item.prefix} ${item.name}`.toLowerCase();
+                const activity = item.block2.toLowerCase();
+                return fullName.includes(keyword) || activity.includes(keyword);
+            });
+            renderTable(filteredData);
+        });
+
+        // ------------------------------------------------------------------
+        // ฟังก์ชันสร้างและดาวน์โหลดเกียรติบัตร (หัวใจหลัก)
+        // ------------------------------------------------------------------
+        function downloadCertificate(personData) {
+            if (!isImageLoaded) {
+                showToast("กำลังเตรียมระบบหลังบ้าน กรุณารอสักครู่แล้วกดใหม่...", "info");
+                return;
+            }
+
+            try {
+                showToast(`กำลังสร้างเกียรติบัตรของ ${personData.name}...`, "info");
+
+                // ล้าง Canvas ด้วยการวาดภาพพื้นหลังทับลงไปใหม่
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+                // หาจุดกึ่งกลาง (Center)
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+
+                // -------------------------------------------------------------------
+                // เริ่มวาดข้อความ (พร้อมแปลงเลขไทยอัตโนมัติ)
+                // -------------------------------------------------------------------
+                
+                // Block 1: ชื่อ-สกุล (จัดกึ่งกลาง)
+                const fullName = convertToThaiNumerals(`${personData.prefix} ${personData.name}`.trim());
+                ctx.textAlign = "center"; 
+                ctx.font = "bold 90px 'Sarabun'"; 
+                ctx.fillStyle = "#1e3a8a"; // สีน้ำเงินเข้ม
+                ctx.fillText(fullName, centerX, centerY + COORD.block1_Y);
+                
+                // Block 2: ข้อความบรรทัด 1 (จัดกึ่งกลาง)
+                const textLine1 = convertToThaiNumerals(personData.block2);
+                ctx.font = "500 50px 'Sarabun'";
+                ctx.fillStyle = "#374151"; // สีเทาเข้ม
+                ctx.fillText(textLine1, centerX, centerY + COORD.block2_Y);
+
+                // Block 3: ข้อความบรรทัด 2 (จัดกึ่งกลาง)
+                const textLine2 = convertToThaiNumerals(personData.block3);
+                // ขนาดฟอนต์ 50 เท่ากัน
+                ctx.fillText(textLine2, centerX, centerY + COORD.block3_Y);
+
+                // Block 4: วันที่ (จัดกึ่งกลาง)
+                const dateText = convertToThaiNumerals(personData.date);
+                ctx.font = "400 45px 'Sarabun'";
+                ctx.fillStyle = "#4b5563"; // สีเทากลางๆ
+                ctx.fillText(dateText, centerX, centerY + COORD.block4_Y);
+
+                // Block 5: เลขที่เกียรติบัตร (จัดชิดขวา)
+                const certNumText = convertToThaiNumerals(personData.certNumber);
+                ctx.textAlign = "right"; // *สำคัญ: จัดชิดขวาให้ปลายตัวอักษรอยู่ตรงจุดพิกัด
+                ctx.font = "bold 40px 'Sarabun'";
+                ctx.fillStyle = "#1f2937";
+                ctx.fillText(certNumText, centerX + COORD.block5_X, centerY + COORD.block5_Y);
+
+                // -------------------------------------------------------------------
+                // สั่งดาวน์โหลด
+                // -------------------------------------------------------------------
+                
+                // แปลง Canvas เป็น Base64 Image URL
+                const dataURL = canvas.toDataURL('image/png');
+                
+                // สร้างลิงก์ชั่วคราวเพื่อสั่งคลิกดาวน์โหลด
+                const link = document.createElement('a');
+                link.download = `เกียรติบัตร_${personData.name}.png`;
+                link.href = dataURL;
+                document.body.appendChild(link); // Append ก่อนคลิกเพื่อความเข้ากันได้
+                link.click();
+                document.body.removeChild(link); // ลบทิ้งเมื่อโหลดเสร็จ
+
+                setTimeout(() => {
+                    showToast("ดาวน์โหลดสำเร็จ!", "success");
+                }, 500);
+
+            } catch (err) {
+                console.error("Generate error:", err);
+                showToast("เกิดข้อผิดพลาดขณะวาดเกียรติบัตร", "error");
+            }
+        }
+
+        // เริ่มทำงานเมื่อเปิดหน้าเว็บ
+        window.onload = function() {
+            // โหลดฟอนต์ให้เสร็จก่อน เพื่อป้องกันตัวอักษรเพี้ยนในการโหลดครั้งแรก
             document.fonts.ready.then(function() {
-                renderCertificate();
+                preloadImage(); // โหลดรูปพื้นหลัง
+                fetchData();    // โหลดข้อมูลจาก Sheet
             });
         };
 
-        // ผูก Event Listener ให้กับ Slider เมื่อมีการเลื่อน (input) ให้วาดเกียรติบัตรใหม่ทันที
-        document.getElementById('b1Y').addEventListener('input', renderCertificate);
-        document.getElementById('b2Y').addEventListener('input', renderCertificate);
-        document.getElementById('b3Y').addEventListener('input', renderCertificate);
-        document.getElementById('b4Y').addEventListener('input', renderCertificate);
-        document.getElementById('b5X').addEventListener('input', renderCertificate);
-        document.getElementById('b5Y').addEventListener('input', renderCertificate);
-
-        // 3. ฟังก์ชันสำหรับกดปุ่มดาวน์โหลด
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            try {
-                // แปลงสิ่งที่วาดบน Canvas ทั้งหมดให้เป็นข้อมูลรูปภาพ PNG
-                const dataURL = canvas.toDataURL('image/png');
-                
-                // สร้างลิงก์ดาวน์โหลดจำลองแล้วสั่งคลิก
-                const link = document.createElement('a');
-                link.download = `เกียรติบัตร_${mockData.name}.png`;
-                link.href = dataURL;
-                link.click();
-            } catch (error) {
-                console.error("Download failed:", error);
-                // หากติดปัญหา CORS (เปิดไฟล์แบบ Local) จะเข้าเงื่อนไขนี้
-                alert("เกิดข้อผิดพลาดในการดาวน์โหลด (CORS Error)\n\nกรุณาเปิดไฟล์ HTML นี้ผ่าน Local Server (เช่น Live Server ใน VS Code) หรืออัปโหลดขึ้น GitHub Pages เพื่อให้ระบบความปลอดภัยของเบราว์เซอร์อนุญาตให้ดาวน์โหลดภาพได้ครับ");
-            }
-        });
-        
-        // ลบ Event Listener เก่าออก
-        
     </script>
 </body>
 </html>
