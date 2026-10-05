@@ -24,29 +24,49 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
-                เครื่องมือปรับตำแหน่งข้อความ (แกน Y)
+                เครื่องมือปรับตำแหน่งข้อความ (5 Blocks)
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-                        <span>ชื่อ-สกุล</span> <span id="valName" class="text-indigo-600 font-bold">-30</span>
+                        <span>Block 1: ชื่อ-สกุล (Y)</span> <span id="valB1" class="text-indigo-600 font-bold">-140</span>
                     </label>
-                    <input type="range" id="nameY" min="-400" max="400" value="-30" class="w-full accent-indigo-600">
+                    <input type="range" id="b1Y" min="-500" max="500" value="-140" class="w-full accent-indigo-600">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-                        <span>ชื่อกิจกรรม</span> <span id="valAct" class="text-indigo-600 font-bold">70</span>
+                        <span>Block 2: ข้อความ 1 (Y)</span> <span id="valB2" class="text-indigo-600 font-bold">-10</span>
                     </label>
-                    <input type="range" id="actY" min="-400" max="400" value="70" class="w-full accent-indigo-600">
+                    <input type="range" id="b2Y" min="-500" max="500" value="-10" class="w-full accent-indigo-600">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
-                        <span>วันที่</span> <span id="valDate" class="text-indigo-600 font-bold">160</span>
+                        <span>Block 3: ข้อความ 2 (Y)</span> <span id="valB3" class="text-indigo-600 font-bold">70</span>
                     </label>
-                    <input type="range" id="dateY" min="-400" max="400" value="160" class="w-full accent-indigo-600">
+                    <input type="range" id="b3Y" min="-500" max="500" value="70" class="w-full accent-indigo-600">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                        <span>Block 4: วันที่ (Y)</span> <span id="valB4" class="text-indigo-600 font-bold">220</span>
+                    </label>
+                    <input type="range" id="b4Y" min="-500" max="500" value="220" class="w-full accent-indigo-600">
+                </div>
+                <div class="col-span-1 md:col-span-2 lg:col-span-2 grid grid-cols-2 gap-4 bg-pink-50 p-3 rounded-lg border border-pink-200">
+                    <div>
+                        <label class="block text-xs font-medium text-pink-700 mb-1 flex justify-between">
+                            <span>Block 5: เลขที่ (แกน X แนวนอน)</span> <span id="valB5X" class="text-pink-700 font-bold">580</span>
+                        </label>
+                        <input type="range" id="b5X" min="0" max="1000" value="580" class="w-full accent-pink-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-pink-700 mb-1 flex justify-between">
+                            <span>Block 5: เลขที่ (แกน Y แนวตั้ง)</span> <span id="valB5Y" class="text-pink-700 font-bold">-370</span>
+                        </label>
+                        <input type="range" id="b5Y" min="-600" max="600" value="-370" class="w-full accent-pink-600">
+                    </div>
                 </div>
             </div>
-            <p class="text-xs text-indigo-600 mt-3">* ลองเลื่อนแถบด้านบนเพื่อดูข้อความขยับขึ้นลงแบบเรียลไทม์ จะได้ไม่ต้องสุ่มแก้ตัวเลขในโค้ดครับ</p>
+            <p class="text-xs text-indigo-600 mt-3">* Block 1-4 จัดกึ่งกลางอัตโนมัติ (ขยับแค่ขึ้นลง) / Block 5 ขยับได้ทั้งซ้าย-ขวา และ ขึ้น-ลง</p>
         </div>
 
         <!-- พื้นที่แสดงตัวอย่างเกียรติบัตร -->
@@ -64,22 +84,24 @@
     </div>
 
     <script>
-        // 1. กำหนดข้อมูลจำลอง (Mock Data)
+        // 1. กำหนดข้อมูลจำลอง (Mock Data) 5 Blocks
         const mockData = {
-            name: "นายคมสัน คงเอี่ยม",
-            activity: "ผ่านการอบรมเชิงปฏิบัติการ การจัดการเรียนรู้ด้านปัญญาประดิษฐ์",
-            date: "ให้ไว้ ณ วันที่ 2 ตุลาคม 2569"
+            block1: "นายคมสัน คงเอี่ยม",
+            block2: "ผ่านการอบรมเชิงปฏิบัติการ การจัดการเรียนรู้ด้านปัญญาประดิษฐ์",
+            block3: "ระดับชั้นประถมศึกษาปีที่ ๔-๖ ประจำปีงบประมาณ พ.ศ. ๒๕๖๙",
+            block4: "ให้ไว้ ณ วันที่ ๒ ตุลาคม ๒๕๖๙",
+            block5: "เลขที่ ศธ ๐๔๐๔๐/๒๕๖๙"
         };
 
         const canvas = document.getElementById('certCanvas');
         const ctx = canvas.getContext('2d');
         const img = new Image();
         
-        // สำคัญมาก! บรรทัดนี้ช่วยให้ดึงรูปจากโดเมนอื่นมาวาด Canvas แล้วกดโหลดได้โดยไม่ติด CORS Error
+        // IMPORTANT: Set crossOrigin BEFORE setting the src to avoid CORS issues when downloading
         img.crossOrigin = "anonymous"; 
         
         // ใส่ URL รูปภาพพื้นหลังที่ฝากไว้บน GitHub
-        img.src = "https://gorpor.github.io/ry2-Certificate/bg00.png";
+        img.src = "https://gorpor.github.io/ry2-Certificate/bg01.png";
 
         // ฟังก์ชันสำหรับวาดเกียรติบัตร (แยกออกมาเพื่อให้เรียกซ้ำได้เวลาเลื่อนแถบ Slider)
         function renderCertificate() {
@@ -90,35 +112,51 @@
             // วาดรูปพื้นหลัง
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             
-            // ดึงค่าการปรับตำแหน่งจาก Slider
-            const nameY = parseInt(document.getElementById('nameY').value);
-            const actY = parseInt(document.getElementById('actY').value);
-            const dateY = parseInt(document.getElementById('dateY').value);
+            // ดึงค่าการปรับตำแหน่งจาก Slider 
+            const b1Y = parseInt(document.getElementById('b1Y').value);
+            const b2Y = parseInt(document.getElementById('b2Y').value);
+            const b3Y = parseInt(document.getElementById('b3Y').value);
+            const b4Y = parseInt(document.getElementById('b4Y').value);
+            const b5X = parseInt(document.getElementById('b5X').value);
+            const b5Y = parseInt(document.getElementById('b5Y').value);
             
             // อัปเดตตัวเลขที่แสดงบนหน้าจอ
-            document.getElementById('valName').innerText = nameY;
-            document.getElementById('valAct').innerText = actY;
-            document.getElementById('valDate').innerText = dateY;
+            document.getElementById('valB1').innerText = b1Y;
+            document.getElementById('valB2').innerText = b2Y;
+            document.getElementById('valB3').innerText = b3Y;
+            document.getElementById('valB4').innerText = b4Y;
+            document.getElementById('valB5X').innerText = b5X;
+            document.getElementById('valB5Y').innerText = b5Y;
 
             // ตั้งค่าจุดอ้างอิงตรงกลาง
-            ctx.textAlign = "center"; 
             const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2; // จุดกึ่งกลางความสูง
+            const centerY = canvas.height / 2; 
 
-            // วาดชื่อ-สกุล
+            // วาด Block 1: ชื่อ-สกุล (Center)
+            ctx.textAlign = "center"; 
             ctx.font = "bold 90px 'Sarabun'"; 
             ctx.fillStyle = "#1e3a8a"; 
-            ctx.fillText(mockData.name, centerX, centerY + nameY); 
+            ctx.fillText(mockData.block1, centerX, centerY + b1Y); 
             
-            // วาดชื่อกิจกรรม
+            // วาด Block 2: ข้อความชุดที่ 1 (Center)
             ctx.font = "500 50px 'Sarabun'";
             ctx.fillStyle = "#374151"; 
-            ctx.fillText(mockData.activity, centerX, centerY + actY);
+            ctx.fillText(mockData.block2, centerX, centerY + b2Y);
 
-            // วาดวันที่
+            // วาด Block 3: ข้อความชุดที่ 2 (Center)
+            ctx.fillText(mockData.block3, centerX, centerY + b3Y);
+
+            // วาด Block 4: วันที่ (Center)
             ctx.font = "400 45px 'Sarabun'";
             ctx.fillStyle = "#4b5563"; 
-            ctx.fillText(mockData.date, centerX, centerY + dateY);
+            ctx.fillText(mockData.block4, centerX, centerY + b4Y);
+
+            // วาด Block 5: เลขที่ (Right Aligned)
+            ctx.textAlign = "right"; // จัดชิดขวา
+            ctx.font = "bold 40px 'Sarabun'";
+            ctx.fillStyle = "#1f2937"; 
+            // อ้างอิงจากตรงกลางภาพ บวกกับค่า X ที่ปรับได้
+            ctx.fillText(mockData.block5, centerX + b5X, centerY + b5Y);
         }
 
         // 2. เมื่อรูปโหลดเสร็จ ให้ทำการวาด (Render)
@@ -130,21 +168,33 @@
         };
 
         // ผูก Event Listener ให้กับ Slider เมื่อมีการเลื่อน (input) ให้วาดเกียรติบัตรใหม่ทันที
-        document.getElementById('nameY').addEventListener('input', renderCertificate);
-        document.getElementById('actY').addEventListener('input', renderCertificate);
-        document.getElementById('dateY').addEventListener('input', renderCertificate);
+        document.getElementById('b1Y').addEventListener('input', renderCertificate);
+        document.getElementById('b2Y').addEventListener('input', renderCertificate);
+        document.getElementById('b3Y').addEventListener('input', renderCertificate);
+        document.getElementById('b4Y').addEventListener('input', renderCertificate);
+        document.getElementById('b5X').addEventListener('input', renderCertificate);
+        document.getElementById('b5Y').addEventListener('input', renderCertificate);
 
         // 3. ฟังก์ชันสำหรับกดปุ่มดาวน์โหลด
         document.getElementById('downloadBtn').addEventListener('click', function() {
-            // แปลงสิ่งที่วาดบน Canvas ทั้งหมดให้เป็นข้อมูลรูปภาพ PNG
-            const dataURL = canvas.toDataURL('image/png');
-            
-            // สร้างลิงก์ดาวน์โหลดจำลองแล้วสั่งคลิก
-            const link = document.createElement('a');
-            link.download = `เกียรติบัตร_${mockData.name}.png`;
-            link.href = dataURL;
-            link.click();
+            try {
+                // แปลงสิ่งที่วาดบน Canvas ทั้งหมดให้เป็นข้อมูลรูปภาพ PNG
+                const dataURL = canvas.toDataURL('image/png');
+                
+                // สร้างลิงก์ดาวน์โหลดจำลองแล้วสั่งคลิก
+                const link = document.createElement('a');
+                link.download = `เกียรติบัตร_${mockData.name}.png`;
+                link.href = dataURL;
+                link.click();
+            } catch (error) {
+                console.error("Download failed:", error);
+                // หากติดปัญหา CORS (เปิดไฟล์แบบ Local) จะเข้าเงื่อนไขนี้
+                alert("เกิดข้อผิดพลาดในการดาวน์โหลด (CORS Error)\n\nกรุณาเปิดไฟล์ HTML นี้ผ่าน Local Server (เช่น Live Server ใน VS Code) หรืออัปโหลดขึ้น GitHub Pages เพื่อให้ระบบความปลอดภัยของเบราว์เซอร์อนุญาตให้ดาวน์โหลดภาพได้ครับ");
+            }
         });
+        
+        // ลบ Event Listener เก่าออก
+        
     </script>
 </body>
 </html>
