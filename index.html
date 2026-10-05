@@ -262,8 +262,8 @@
             document.getElementById('noResultState').classList.remove('flex');
 
             dataToRender.forEach((item, index) => {
-                // ประกอบคำนำหน้าและชื่อ-สกุล
-                const fullName = `${item.prefix} ${item.name}`.trim();
+                // ประกอบคำนำหน้าและชื่อ-สกุล (แก้ไข: เอาช่องว่างระหว่าง prefix และ name ออกเพื่อให้ตัวอักษรติดกัน)
+                const fullName = `${item.prefix}${item.name}`.trim();
                 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-blue-50 transition-colors";
@@ -323,8 +323,8 @@
                 // เริ่มวาดข้อความ (พร้อมแปลงเลขไทยอัตโนมัติ)
                 // -------------------------------------------------------------------
                 
-                // Block 1: ชื่อ-สกุล (จัดกึ่งกลาง)
-                const fullName = convertToThaiNumerals(`${personData.prefix} ${personData.name}`.trim());
+                // Block 1: ชื่อ-สกุล (จัดกึ่งกลาง - แก้ไข: เอาช่องว่างออกให้คำนำหน้าติดกับชื่อ)
+                const fullName = convertToThaiNumerals(`${personData.prefix}${personData.name}`.trim());
                 ctx.textAlign = "center"; 
                 ctx.font = "bold 90px 'Sarabun'"; 
                 ctx.fillStyle = "#1e3a8a"; // สีน้ำเงินเข้ม
