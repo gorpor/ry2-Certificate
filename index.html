@@ -31,17 +31,15 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-blue-800 text-white py-6 shadow-md">
+    <header id="appHeader" class="bg-blue-800 text-white py-6 shadow-md transition-colors duration-300">
         <div class="container mx-auto px-4 max-w-6xl flex flex-col md:flex-row items-center justify-between">
             <div class="flex items-center gap-4">
-                <!-- โลโก้ (ใช้ SVG จำลอง) -->
-                <div class="bg-white p-2 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
+                <!-- โลโก้ (เปลี่ยนเป็นลิงก์รูปภาพที่กำหนด) -->
+                <div class="bg-white p-1 rounded-full shadow-sm flex items-center justify-center h-14 w-14 overflow-hidden">
+                    <img src="https://lh5.googleusercontent.com/d/11lT0KghZEJcvK8GjV_IHeB3Xz8HqXjNj" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="text-3xl font-bold">ระบบเกียรติบัตรออนไลน์</h1>
@@ -110,6 +108,13 @@
         </div>
     </main>
 
+    <!-- Footer (เพิ่มใหม่ตามคำขอ) -->
+    <footer id="appFooter" class="bg-blue-800 text-white py-8 mt-auto shadow-inner transition-colors duration-300">
+        <div class="container mx-auto px-4 max-w-6xl text-center md:text-left flex flex-col items-center justify-center">
+            <p id="footerTextDisplay" class="text-sm md:text-base leading-relaxed whitespace-pre-line text-blue-50 text-center"></p>
+        </div>
+    </footer>
+
     <!-- Canvas สำหรับวาดเกียรติบัตรเบื้องหลัง -->
     <canvas id="certCanvas"></canvas>
 
@@ -138,7 +143,8 @@
         };
 
         // ตัวแปรเก็บข้อมูล
-        let certificateData = []; // เก็บข้อมูลทั้งหมดที่โหลดมา
+        let certificateData = []; 
+        let appSettings = null; // ตัวแปรเก็บค่า Setting
         let backgroundImage = new Image();
         let isImageLoaded = false;
 
@@ -217,7 +223,6 @@
 
         // ดึงข้อมูลจาก Google Apps Script
         async function fetchData() {
-            // แสดงสถานะโหลด
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('tableContainer').classList.add('hidden');
             document.getElementById('errorState').classList.add('hidden');
@@ -229,6 +234,15 @@
                 
                 if (result.status === "success") {
                     certificateData = result.data;
+                    appSettings = result.settings; // รับค่า Setting จาก Sheet
+
+                    // นำ Setting มาปรับใช้กับหน้าเว็บแบบ Real-time
+                    if(appSettings) {
+                        document.getElementById('appHeader').style.backgroundColor = appSettings.themeColor;
+                        document.getElementById('appFooter').style.backgroundColor = appSettings.themeColor;
+                        document.getElementById('footerTextDisplay').innerText = appSettings.footerText;
+                    }
+
                     renderTable(certificateData);
                     
                     // ซ่อนสถานะโหลด แสดงตาราง
@@ -319,39 +333,45 @@
                 const centerX = canvas.width / 2;
                 const centerY = canvas.height / 2;
 
+                // ดึงค่า Setting สีและขนาด Font ถ้าไม่มีให้ใช้ค่าเริ่มต้น
+                const fontColor = appSettings ? appSettings.fontColor : "#1e3a8a";
+                const sizeOffset = appSettings ? appSettings.fontSizeOffset : 0;
+
                 // -------------------------------------------------------------------
-                // เริ่มวาดข้อความ (พร้อมแปลงเลขไทยอัตโนมัติ)
+                // เริ่มวาดข้อความ (แปลงเลขไทย + ใช้ Setting จาก Sheet)
                 // -------------------------------------------------------------------
                 
-                // Block 1: ชื่อ-สกุล (จัดกึ่งกลาง - แก้ไข: เอาช่องว่างออกให้คำนำหน้าติดกับชื่อ)
+                // Block 1: ชื่อ-สกุล (จัดกึ่งกลาง)
                 const fullName = convertToThaiNumerals(`${personData.prefix}${personData.name}`.trim());
                 ctx.textAlign = "center"; 
-                ctx.font = "bold 90px 'Sarabun'"; 
-                ctx.fillStyle = "#1e3a8a"; // สีน้ำเงินเข้ม
+                // ใช้ Base Size + Offset ที่ผู้ใช้กรอกมา
+                ctx.font = `bold ${88 + sizeOffset}px 'Sarabun'`; 
+                ctx.fillStyle = fontColor;
                 ctx.fillText(fullName, centerX, centerY + COORD.block1_Y);
                 
-                // Block 2: ข้อความบรรทัด 1 (จัดกึ่งกลาง)
+                // Block 2: ข้อความบรรทัด 1 
                 const textLine1 = convertToThaiNumerals(personData.block2);
-                ctx.font = "500 50px 'Sarabun'";
-                ctx.fillStyle = "#374151"; // สีเทาเข้ม
+                ctx.font = `500 ${48 + sizeOffset}px 'Sarabun'`;
+                ctx.fillStyle = fontColor;
                 ctx.fillText(textLine1, centerX, centerY + COORD.block2_Y);
 
-                // Block 3: ข้อความบรรทัด 2 (จัดกึ่งกลาง)
+                // Block 3: ข้อความบรรทัด 2 
                 const textLine2 = convertToThaiNumerals(personData.block3);
-                // ขนาดฟอนต์ 50 เท่ากัน
+                ctx.font = `500 ${48 + sizeOffset}px 'Sarabun'`;
+                ctx.fillStyle = fontColor;
                 ctx.fillText(textLine2, centerX, centerY + COORD.block3_Y);
 
-                // Block 4: วันที่ (จัดกึ่งกลาง)
+                // Block 4: วันที่ 
                 const dateText = convertToThaiNumerals(personData.date);
-                ctx.font = "400 45px 'Sarabun'";
-                ctx.fillStyle = "#4b5563"; // สีเทากลางๆ
+                ctx.font = `400 ${43 + sizeOffset}px 'Sarabun'`;
+                ctx.fillStyle = fontColor; 
                 ctx.fillText(dateText, centerX, centerY + COORD.block4_Y);
 
                 // Block 5: เลขที่เกียรติบัตร (จัดชิดขวา)
                 const certNumText = convertToThaiNumerals(personData.certNumber);
-                ctx.textAlign = "right"; // *สำคัญ: จัดชิดขวาให้ปลายตัวอักษรอยู่ตรงจุดพิกัด
-                ctx.font = "bold 40px 'Sarabun'";
-                ctx.fillStyle = "#1f2937";
+                ctx.textAlign = "right"; 
+                ctx.font = `bold ${38 + sizeOffset}px 'Sarabun'`;
+                ctx.fillStyle = fontColor;
                 ctx.fillText(certNumText, centerX + COORD.block5_X, centerY + COORD.block5_Y);
 
                 // -------------------------------------------------------------------
